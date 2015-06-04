@@ -13,20 +13,53 @@ widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Placeholder Introduction stuff
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## Loading and preprocessing the data
 
-And this
+```{r,echo=TRUE}
+library(knitr)
+library(ggplot2)
+library(dplyr)
 
-```{r}
-summary(cars)
 ```
 
-You can also embed plots, for example:
 
-```{r, echo=FALSE}
-plot(cars)
+```{r,echo=TRUE}
+data <- tbl_df(read.csv("./activity.csv",sep = ","))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+First it is important to replace the elements that are NA with 
+at leat a best guess of each value.
+ste
+
+```{r,echo=TRUE}
+replacements <- data %>% filter( !is.na(steps)) %>% group_by(interval) %>% summarize( ave_steps = floor(mean(steps)))
+```
+
+```{r,echo=TRUE}
+altered <- mutate(data, date=date,steps = ifelse(  is.na(steps) , replacements[which( interval == replacements$interval )]$ave_steps, steps))
+```
+## What is mean total number of steps taken per day?
+
+```{r,echo=TRUE}
+perday <-  altered %>% group_by( date ) %>% summarise( total_steps =sum(steps ))
+hist(perday$total_steps)
+```
+##Calculate and report the mean and median of the total number of steps taken per day
+```{r,echo=TRUE,results='asis'}
+perday_stats <- altered %>% group_by( date ) %>% summarise( mean_steps = mean(steps ), median_steps = median(steps))
+knitr::kable(perday_stats)
+```
+
+
+## What is the average daily activity pattern?
+
+
+
+## Imputing missing values
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
+
