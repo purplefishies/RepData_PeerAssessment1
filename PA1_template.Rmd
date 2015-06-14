@@ -22,6 +22,7 @@ library(knitr)
 library(ggplot2)
 library(dplyr)
 library(lubridate)
+library(magrittr)
 ```
 
 # Loading and preprocessing the data.
@@ -105,8 +106,25 @@ perday_stats <- altered %>% group_by( date ) %>% summarise( mean_steps = mean(st
 knitr::kable(perday_stats)
 ```
 
-
-
 ## Are there differences in activity patterns between weekdays and weekends?
+We will create a new dataset from the altered dataset and create a new 
+column for the type of day being either a weekend or a weekday.
 
+```{r,echo=TRUE,results='asis'}
+newaltered <- altered %>% mutate(type_of_day=ifelse(weekdays(as.POSIXlt(date)) %in% c("Sunday","Saturday"),"weekend","weekday"))
+```
 
+Next we will create a new variable that contains the group by interval for
+each type of type of day to determine how the activity is affected by
+whether we are in a weekend or not.
+
+```{r,echo=TRUE,results='asis'}
+per_type_of_day <- newaltered %>% group_by( interval, type_of_day ) %>% summarise( mean_steps = mean(steps ) )
+```
+
+```{r,echo=TRUE,results='asis'}
+per_type_of_day %>%
+qplot( interval, mean_steps , color = type_of_day, data = . , geom = "line" ) %>%
+add( ggtitle("Average steps taken per Time Interval ")) %>%
+print
+```
