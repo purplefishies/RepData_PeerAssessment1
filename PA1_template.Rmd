@@ -12,6 +12,11 @@ url:
 widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
 ---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='./figure/',
+                     warning=FALSE, message=FALSE)
+
+```
 
 Placeholder Introduction stuff
 
@@ -36,14 +41,15 @@ data <- tbl_df(read.csv("./activity.csv",sep = ","))
 
 ```{r,echo=TRUE}
 perday <-  data %>% group_by( date ) %>% summarise( total_steps =sum(steps,na.rm=T ))
-hist(perday$total_steps)
+hist(perday$total_steps,breaks=30)
 ```
 
 
 ##Calculate and report the mean and median of the total number of steps taken per day
 ```{r,echo=TRUE,results='asis'}
 perday_stats <- data %>% transmute( steps=ifelse(is.na(steps),0,steps), date=date,interval=interval) %>%
-   group_by( date ) %>% summarise( mean_steps = mean(steps ), median_steps = median(steps)) 
+   group_by( date ) %>% 
+   summarise( mean_steps = mean(steps ), median_steps = median(steps,na.rm=T)) 
 knitr::kable(perday_stats)
 ```
 
@@ -91,7 +97,7 @@ altered <- mutate(data, date=date,steps = ifelse(  is.na(steps) , replacements[w
 Now lets perform a summary based on the total steps for those days using the new altered dataset that was created.
 ```{r,echo=TRUE}
 perday <-  altered %>% group_by( date ) %>% summarise( total_steps =sum(steps ))
-hist(perday$total_steps)
+hist(perday$total_steps,breaks=30)
 ```
 
 ```{r,echo=TRUE}
