@@ -48,14 +48,20 @@ perday_stats <- data %>% transmute( steps=ifelse(is.na(steps),0,steps), date=dat
 knitr::kable(perday_stats)
 ```
 
-## data %>% group_by( date ) %>% summarise( mean_steps = mean(steps ), median_steps = median(steps))
-
 ## What is the average daily activity pattern?
-```{r,echo=TRUE}
-per_interval <- altered %>% group_by( interval ) %>% summarise( ave_steps = mean(steps ))
 
+### The following chart is the average number of steps taken per 5 minute period
+```{r,echo=TRUE}
+per_interval <- data %>% transmute( steps=ifelse(is.na(steps),0,steps), date=date,interval=interval) %>% 
+   group_by( interval ) %>% summarise( ave_steps = mean(steps ))
+plot(per_interval$interval,per_interval$ave_steps,type="l")
 ```
 
+### The following represents the maximum 
+```{r,echo=TRUE}
+index <- which(per_interval$ave_steps == max( per_interval$ave_steps ))
+per_interval[index,]$interval
+```
 
 ## Imputing missing values
 
