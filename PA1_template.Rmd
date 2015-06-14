@@ -47,8 +47,8 @@ hist(perday$total_steps,breaks=30)
 
 ##Calculate and report the mean and median of the total number of steps taken per day
 ```{r,echo=TRUE,results='asis'}
-perday_stats <- data %>% transmute( steps=ifelse(is.na(steps),0,steps), date=date,interval=interval) %>%
-   group_by( date ) %>% 
+perday_stats <- data %>% 
+   transmute( steps=ifelse(is.na(steps),0,steps), date=date,interval=interval) %>%
    summarise( mean_steps = mean(steps ), median_steps = median(steps,na.rm=T)) 
 knitr::kable(perday_stats)
 ```
@@ -107,7 +107,7 @@ plot( ts(per_interval$interval), per_interval$ave_steps , type="l")
 
 ##Calculate and report the mean and median of the total number of steps taken per day
 ```{r,echo=TRUE,results='asis'}
-perday_stats <- altered %>% group_by( date ) %>% summarise( mean_steps = mean(steps ), median_steps = median(steps))
+perday_stats <- altered %>%  summarise( mean_steps = mean(steps ), median_steps = median(steps))
 knitr::kable(perday_stats)
 ```
 
