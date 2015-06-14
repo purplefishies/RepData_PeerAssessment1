@@ -56,18 +56,15 @@ per_interval <- data %>% transmute( steps=ifelse(is.na(steps),0,steps), date=dat
 plot(per_interval$interval,per_interval$ave_steps,type="l")
 ```
 
-### The following represents the maximum 
+### The following interval represents the interval with the most number of steps
 ```{r,echo=TRUE}
 index <- which(per_interval$ave_steps == max( per_interval$ave_steps ))
 per_interval[index,]$interval
 ```
 
-## Imputing missing values
+## Dealing with missing values
 
-Replacing  it is important to replace the elements that are NA with 
-at leat a best guess of each value.
-ste
-
+First we need to find out the total number of missing values that we are dealing with. We can calculate it as follows:
 
 ### Determing the number of NA's in the dataset
 ```{r,echo=TRUE}
@@ -85,7 +82,7 @@ replacements <- data %>%
 knitr::kable(replacements)
 ```
 
-Next, create a new dataset called altered that replaces steps with the average value for that
+Next, create a new dataset called **altered** that replaces steps with the average value for that
 interval. 
 ```{r,echo=TRUE}
 altered <- mutate(data, date=date,steps = ifelse(  is.na(steps) , replacements[which( interval == replacements$interval )]$ave_steps, steps))
@@ -113,7 +110,8 @@ We will create a new dataset from the altered dataset and create a new
 column for the type of day being either a weekend or a weekday.
 
 ```{r,echo=TRUE,results='asis'}
-newaltered <- altered %>% mutate(type_of_day=ifelse(weekdays(as.POSIXlt(date)) %in% c("Sunday","Saturday"),"weekend","weekday"))
+newaltered <- altered %>% 
+  mutate(type_of_day=ifelse(weekdays(as.POSIXlt(date)) %in% c("Sunday","Saturday"),"weekend","weekday"))
 ```
 
 Next we will create a new variable that contains the group by interval for
@@ -121,12 +119,14 @@ each type of type of day to determine how the activity is affected by
 whether we are in a weekend or not.
 
 ```{r,echo=TRUE,results='asis'}
-per_type_of_day <- newaltered %>% group_by( interval, type_of_day ) %>% summarise( mean_steps = mean(steps ) )
+per_type_of_day <- newaltered %>% 
+    group_by( interval, type_of_day ) %>% 
+    summarise( mean_steps = mean(steps ) )
 ```
 
 ```{r,echo=TRUE,results='asis'}
 per_type_of_day %>%
-qplot( interval, mean_steps , color = type_of_day, data = . , geom = "line" ) %>%
-add( ggtitle("Average steps taken per Time Interval ")) %>%
-print
+  qplot( interval, mean_steps , color = type_of_day, data = . , geom = "line" ) %>%
+  add( ggtitle("Average steps taken per Time Interval ")) %>%
+  print
 ```
