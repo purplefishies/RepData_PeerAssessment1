@@ -131,8 +131,8 @@ per_type_of_day <- newaltered %>%
 ```
 
 ```{r,echo=TRUE,results='asis'}
-per_type_of_day %>%
-  qplot( interval, mean_steps , color = type_of_day, data = . , geom = "line" ) %>%
-  add( ggtitle("Average steps taken per Time Interval ")) %>%
-  print
+p <- ggplot(per_type_of_day, aes(x=as.numeric(interval), y=mean_steps)) +
+     facet_grid(type_of_day~.) + geom_line(colour="blue") +
+     xlab("Interval Time")  + ylab("Average Steps Per Interval")
+p
 ```
