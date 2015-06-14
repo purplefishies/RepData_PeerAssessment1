@@ -62,7 +62,7 @@ per_interval <- data %>% transmute( steps=ifelse(is.na(steps),0,steps), date=dat
 plot(per_interval$interval,per_interval$ave_steps,type="l")
 ```
 
-### The following interval represents the interval with the most number of steps
+### The following interval represents the interval with the MOST number of steps
 ```{r,echo=TRUE}
 index <- which(per_interval$ave_steps == max( per_interval$ave_steps ))
 per_interval[index,]$interval
@@ -85,7 +85,6 @@ replacements <- data %>%
   filter( !is.na(steps)) %>% 
   group_by(interval) %>% 
   summarize( ave_steps = floor(mean(steps)))
-knitr::kable(replacements)
 ```
 
 Next, create a new dataset called **altered** that replaces steps with the average value for that
