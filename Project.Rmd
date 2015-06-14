@@ -26,7 +26,6 @@ library(lubridate)
 
 # Loading and preprocessing the data.
 
-
 ```{r,echo=TRUE}
 data <- tbl_df(read.csv("./activity.csv",sep = ","))
 ```
@@ -35,28 +34,21 @@ Replaceing  it is important to replace the elements that are NA with
 at leat a best guess of each value.
 ste
 
-```{r,echo=TRUE}
-replacements <- data %>%
-  filter( !is.na(steps)) %>% 
-  group_by(interval) %>% 
-  summarize( ave_steps = floor(mean(steps)))
-```
 
-```{r,echo=TRUE}
-altered <- mutate(data, date=date,steps = ifelse(  is.na(steps) , replacements[which( interval == replacements$interval )]$ave_steps, steps))
-```
 ## What is mean total number of steps taken per day?
 
 ```{r,echo=TRUE}
-perday <-  altered %>% group_by( date ) %>% summarise( total_steps =sum(steps ))
+perday <-  data %>% group_by( date ) %>% summarise( total_steps =sum(steps,na.rm=T ))
 hist(perday$total_steps)
 ```
 ##Calculate and report the mean and median of the total number of steps taken per day
 ```{r,echo=TRUE,results='asis'}
-perday_stats <- altered %>% group_by( date ) %>% summarise( mean_steps = mean(steps ), median_steps = median(steps))
+perday_stats <- data %>% transmute( steps=ifelse(is.na(steps),0,steps), date=date,interval=interval) %>%
+   group_by( date ) %>% summarise( mean_steps = mean(steps ), median_steps = median(steps)) 
 knitr::kable(perday_stats)
 ```
 
+## data %>% group_by( date ) %>% summarise( mean_steps = mean(steps ), median_steps = median(steps))
 
 ## What is the average daily activity pattern?
 ```{r,echo=TRUE}
@@ -64,13 +56,37 @@ per_interval <- altered %>% group_by( interval ) %>% summarise( ave_steps = mean
 
 ```
 
+
+## Imputing missing values
+
+
+```{r,echo=TRUE}
+replacements <- data %>%
+  filter( !is.na(steps)) %>% 
+  group_by(interval) %>% 
+  summarize( ave_steps = floor(mean(steps)))
+```
+
+
+```{r,echo=TRUE}
+altered <- mutate(data, date=date,steps = ifelse(  is.na(steps) , replacements[which( interval == replacements$interval )]$ave_steps, steps))
+```
+
+```{r,echo=TRUE}
+perday <-  altered %>% group_by( date ) %>% summarise( total_steps =sum(steps ))
+hist(perday$total_steps)
+```
+
 ```{r,echo=TRUE}
 per_interval <- altered %>% group_by( interval ) %>% summarise( ave_steps = mean(steps ))
 plot( ts(per_interval$interval), per_interval$ave_steps , type="l")
 ```
 
-
-## Imputing missing values
+##Calculate and report the mean and median of the total number of steps taken per day
+```{r,echo=TRUE,results='asis'}
+perday_stats <- altered %>% group_by( date ) %>% summarise( mean_steps = mean(steps ), median_steps = median(steps))
+knitr::kable(perday_stats)
+```
 
 
 
