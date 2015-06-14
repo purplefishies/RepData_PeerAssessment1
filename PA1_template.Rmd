@@ -66,18 +66,29 @@ per_interval[index,]$interval
 ## Imputing missing values
 
 
+### Determing the number of NA's int he dataset
+```{r,echo=TRUE}
+length(which(is.na(data$steps)))
+```
+
+### Employing a strategy for replacing the NA values with the average for the time interval
+
+First save the average steps per each interval into the variable replacements.
 ```{r,echo=TRUE}
 replacements <- data %>%
   filter( !is.na(steps)) %>% 
   group_by(interval) %>% 
   summarize( ave_steps = floor(mean(steps)))
+knitr::kable(replacements)
 ```
 
-
+Next, create a new dataset called altered that replaces steps with the average value for that
+interval. 
 ```{r,echo=TRUE}
 altered <- mutate(data, date=date,steps = ifelse(  is.na(steps) , replacements[which( interval == replacements$interval )]$ave_steps, steps))
 ```
 
+Now lets perform a summary based on the total steps for those days using the new altered dataset that was created.
 ```{r,echo=TRUE}
 perday <-  altered %>% group_by( date ) %>% summarise( total_steps =sum(steps ))
 hist(perday$total_steps)
@@ -97,4 +108,5 @@ knitr::kable(perday_stats)
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
 
