@@ -17,24 +17,29 @@ Placeholder Introduction stuff
 
 ## Loading and preprocessing the data
 
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 library(knitr)
 library(ggplot2)
 library(dplyr)
-
+library(lubridate)
 ```
+
+# Loading and preprocessing the data.
 
 
 ```{r,echo=TRUE}
 data <- tbl_df(read.csv("./activity.csv",sep = ","))
 ```
 
-First it is important to replace the elements that are NA with 
+Replaceing  it is important to replace the elements that are NA with 
 at leat a best guess of each value.
 ste
 
 ```{r,echo=TRUE}
-replacements <- data %>% filter( !is.na(steps)) %>% group_by(interval) %>% summarize( ave_steps = floor(mean(steps)))
+replacements <- data %>%
+  filter( !is.na(steps)) %>% 
+  group_by(interval) %>% 
+  summarize( ave_steps = floor(mean(steps)))
 ```
 
 ```{r,echo=TRUE}
@@ -54,7 +59,15 @@ knitr::kable(perday_stats)
 
 
 ## What is the average daily activity pattern?
+```{r,echo=TRUE}
+per_interval <- altered %>% group_by( interval ) %>% summarise( ave_steps = mean(steps ))
 
+```
+
+```{r,echo=TRUE}
+per_interval <- altered %>% group_by( interval ) %>% summarise( ave_steps = mean(steps ))
+plot( ts(per_interval$interval), per_interval$ave_steps , type="l")
+```
 
 
 ## Imputing missing values
